@@ -2,7 +2,7 @@ import $Gitlab from '../common/gitlab.js';
 import $background from '../common/background.js';
 
 const output = document.querySelector('#gitlab');
-
+let groups, repos;
 function getReviewedState(mr) {
     return mr.state;
 }
@@ -84,19 +84,46 @@ function clickMR(e) {
     } while (el = el.parentNode);
 }
 
+async function getSaved() {
+    groups = await $Gitlab.getSavedGroups();
+    repos = await $Gitlab.getSavedRepos();
+}
 async function setStyle() {
     let defaultColor = await $Gitlab.getDefaultColor();
     let style = document.createElement('style');
-    style.innerText = `.repo {background-color: ${defaultColor};}`;
+    let rules = []
+    rules.push(`.repo {background-color: ${defaultColor};}`);
+    for (let i in groups) {
+        let saved = groups[i];
+        rules.push(`.group-${saved.group} {background-color: ${saved.color};}`);
+    }
+    for (let i in repos) {
+        let saved = repos[i];
+        rules.push(`.repo-${saved.repo} {background-color: ${saved.color};}`);
+    }
+    style.innerText = rules.join('');
     document.body.appendChild(style);
 }
 
 async function createLinks() {
     let user = await $Gitlab.getUserInfo();
-    output.querySelector('.links').innerHTML = `<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo' target="_blank">All</a>`;
+    let links = [];
+    for (let i in groups) {
+        let saved = groups[i];
+        let group = await $Gitlab.getGroupById(saved.group);
+        links.push(`<a href='https://gitlab.com/groups/${group.full_path}/-/merge_requests' class='repo group-${saved.group}' target='_blank'>${saved.name}</a>`);
+    }
+    for (let i in repos) {
+        let saved = repos[i];
+        let repo = await $Gitlab.getRepoById(saved.repo);
+        links.push(`<a href='https://gitlab.com/${repo.path_with_namespace}/merge_requests' class='repo repo-${saved.repo}' target='_blank'>${saved.name}</a>`);
+    }
+    links.push(`<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo' target="_blank">All</a>`);
+    output.querySelector('.links').innerHTML = links.join('');
 }
 
-setStyle()
+getSaved()
+.then(setStyle)
 .then(createLinks)
 .then(getAssigned)
 .then(fillAssigned)
