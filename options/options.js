@@ -1,7 +1,10 @@
 import $Gitlab from '../common/gitlab.js';
+import $util from '../common/util.js';
 
 const form = document.querySelector('form#gitlab');
 let searchId = 0;
+let groups = {};
+let repos = {};
 
 async function loadCredentials() {
     let credentials = await $Gitlab.getUserInfo();
@@ -25,26 +28,35 @@ function forget(e) {
 }
 
 
-function selectCompletion(e) {
-    console.log(e.target);
+async function saveLists() {
+    await $Gitlab.setSavedGroups(groups);
+    await $Gitlab.setSavedRepos(repos);
+}
+async function selectCompletion(e) {
+    let el = e.target;
     e.preventDefault();
+    if (el.dataset.repo) {
+        repos[el.dataset.repo] = await addRepo(el.dataset.group, el.dataset.repo, el.dataset.name, '#6dc34a');
+    } else {
+        groups[el.dataset.group] = await addGroup(el.dataset.group, el.dataset.name, '#6dc34a');
+    }
+    saveLists();
     return false;
 }
 function completion(value) {
-    if (value.path) {
+    if (!value.namespace) {
         // group
         return `
-            <li data-group='${value.path}' data-name='${value.name}'>${value.name}</li>
+            <li data-group='${value.id}' data-name='${value.name}'>${value.name}</li>
         `;
     }
     // repository
     return `
-        <li data-group='${value.namespace.path}' data-repo='${value.path}' data-name='${value.name}'>${value.namespace.name} > ${value.name}</li>
+        <li data-group='${value.namespace.id}' data-repo='${value.id}' data-name='${value.name}'>${value.namespace.name} > ${value.name}</li>
     `;
 }
 function searchAutocomplete(values) {
     let completions = [];
-    console.log(values);
     for (let i = 0, l = Math.min(values.length, 5); i < l; i++) {
         completions.push(completion(values[i]));
     }
@@ -75,33 +87,90 @@ function search(e) {
     e.preventDefault();
     return false;
 }
-function addGroup(group) {
+function saveName(e) {
+    let el = this.parentNode;
+    let id = el.dataset.id;
+    let list = el.classList.contains('group') ? groups : repos;
+    list[id].name = this.value;
+    saveLists();
+    e.preventDefault();
+    return false;
+}
+function saveColor(e) {
+    let el = this.parentNode;
+    let id = el.dataset.id;
+    let list = el.classList.contains('group') ? groups : repos;
+    list[id].color = this.value;
+    saveLists();
+    e.preventDefault();
+    return false;
+}
+function removeItem(e) {
+    let el = this.parentNode;
+    let id = el.dataset.id;
+    let list = el.classList.contains('group') ? groups : repos;
+    delete list[id];
+    console.log(list);
+    saveLists();
+    el.parentNode.removeChild(el);
+    e.preventDefault();
+    return false;
+}
+async function addGroup(groupId, name, color) {
+    let group = await $Gitlab.getGroupById(groupId);
     let el = $util.html(`
-        <div>
-            ${JSON.stringify(group)}
+        <div class='group' data-id='${groupId}'>
+            <button class='remove'>X</button>
+            <span class='id'>${group.name}</span>
+            <input type='text' value='${name}'>
+            <input type='color' value='${color}'>
         </div>
     `);
+    el.querySelector('.remove').addEventListener('click', removeItem);
+    el.querySelector('input[type=text]').addEventListener('change', saveName);
+    el.querySelector('input[type=color]').addEventListener('change', saveColor);
     form.querySelector('#groups-list').appendChild(el);
-    return group;
+    return {
+        group: groupId,
+        name: name,
+        color: color
+    };
+}
+async function addRepo(groupId, repoId, name, color) {
+    let group = await $Gitlab.getGroupById(groupId);
+    let repo = await $Gitlab.getRepoById(repoId);
+    let el = $util.html(`
+        <div class='repo' data-id='${repoId}'>
+            <button class='remove'>X</button>
+            <span class='id'>${group.name} > ${repo.name}</span>
+            <input type='text' value='${name}'>
+            <input type='color' value='${color}'>
+        </div>
+    `);
+    el.querySelector('.remove').addEventListener('click', removeItem);
+    el.querySelector('input[type=text]').addEventListener('change', saveName);
+    el.querySelector('input[type=color]').addEventListener('change', saveColor);
+    form.querySelector('#repos-list').appendChild(el);
+    return {
+        group: groupId,
+        repo: repoId,
+        name: name,
+        color: color
+    };
 }
 
 async function loadGroups() {
-    let groups = await $Gitlab.getSavedGroups();
-    groups.forEach(addGroup);
+    groups = await $Gitlab.getSavedGroups();
+    for (let i in groups) {
+        await addGroup(groups[i].group, groups[i].name, groups[i].color);
+    }
 }
 
-function addRepo(repo) {
-    let el = $util.html(`
-        <div>
-            ${JSON.stringify(repo)}
-        </div>
-    `);
-    form.querySelector('#repos-list').appendChild(el);
-    return repo;
-}
 async function loadRepos() {
-    let groups = await $Gitlab.getSavedGroups();
-    groups.forEach(addRepo);
+    repos = await $Gitlab.getSavedRepos();
+    for (let i in repos) {
+        await addRepo(repos[i].group, repos[i].repo, repos[i].name, repos[i].color);
+    }
 }
 
 function saveDefaultColor(e) {

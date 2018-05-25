@@ -147,17 +147,29 @@ const $GitLab = {
         });
         return group;
     },
+    setSavedGroups: async (groups) => {
+        let groupsString = JSON.stringify(groups);
+        return await $data.set({
+            [DATA_GROUPS]: groupsString
+        });
+    },
     getSavedGroups: async () => {
         let groupsString = await $data.get(DATA_GROUPS);
         if (typeof groupsString !== 'string') {
-            return [];
+            return {};
         }
         return JSON.parse(groupsString);
+    },
+    setSavedRepos: async (repos) => {
+        let reposString = JSON.stringify(repos);
+        return await $data.set({
+            [DATA_REPOS]: reposString
+        });
     },
     getSavedRepos: async () => {
         let reposString = await $data.get(DATA_REPOS);
         if (typeof reposString !== 'string') {
-            return [];
+            return {};
         }
         return JSON.parse(reposString);
     }
