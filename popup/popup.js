@@ -93,7 +93,7 @@ async function setStyle() {
 
 async function createLinks() {
     let user = await $Gitlab.getUserInfo();
-    output.querySelector('.links').innerHTML = `<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo'>All</a>`;
+    output.querySelector('.links').innerHTML = `<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo' target="_blank">All</a>`;
 }
 
 setStyle()
