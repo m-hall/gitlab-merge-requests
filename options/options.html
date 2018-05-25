@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mia's Chrome Scripts Options</title>
+<style>
+.search-list {
+    position: relative;
+    display: block;
+    margin: 1em;
+}
+.search-list > input,
+.search-list > .autocomplete {
+    width: 350px;
+}
+.search-list > input {
+    z-index: 1;
+}
+.autocomplete {
+    display: none;
+    position: absolute;
+    max-height: 100px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid #333;
+    z-index: 2;
+    cursor: pointer;
+}
+.search-list > input:focus + .autocomplete,
+.autocomplete:hover {
+    display: block;
+}
+.autocomplete ul,
+.autocomplete ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.autocomplete li:hover {
+    background: #bbb;
+}
+</style>
+</head>
+<body>
+<form id='gitlab'>
+    <h2>Gitlab</h2>
+    <div class='token'>
+        <label for='token'>Personal Access Token</label>
+        <input type='text' name='token' id='token' placeholder="***************"/>
+        <span id='username'></span>
+    </div>
+    <button type='button' id='forget'>Forget</button> <button type='submit' id='login'>Save</button>
+    <h2>Merge Requests</h2>
+    <div>
+        <label for='default-color'>Default color</label>
+        <input type='color' id='default-color' value='#6dc34a'/>
+    </div>
+    <div class='search-list'>
+        Groups <input type='text' data-list='groups' />
+        <div class='autocomplete'></div>
+        <div class='results' id='groups-list'></div>
+    </div>
+    <div class='search-list'>
+        Repositories <input type='text' data-list='repos' />
+        <div class='autocomplete'></div>
+        <div class='results' id='repos-list'></div>
+    </div>
+</form>
+<script src="./gitlab.js" type="module"></script>
+</body>
+</html>

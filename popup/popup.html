@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    width: 600px;
+}
+.title {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+.repo {
+    color: whitesmoke;
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-size: 0.8em;
+}
+.repo.same {
+    display: none;
+}
+.status {
+    background-color: #F2711C;
+    float: right;
+    color: whitesmoke;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-size: 0.8em;
+}
+.state-UNKNOWN,
+.state-OPEN {
+    background-color: #F2711C;
+}
+.state-AUTHOR {
+    background-color: #820dd5;
+}
+.state-APPROVED {
+    background-color: #6dc34a;
+}
+.state-UNAPPROVED {
+    background-color: #4080d0;
+}
+.state-NEEDS_WORK {
+    background-color: #830922;
+}
+.creator {
+    float: right;
+    padding: 3px 6px;
+    font-size: 0.8em;
+    clear: right;
+}
+
+.reviewer {
+    background-color: #ff99dd;
+}
+.author {
+    background-color: #cc99ff;
+}
+.branches > div {
+    display: inline-block;
+}
+.branches > div + div::before {
+    content: "=>";
+    margin: 0 0.5em;
+}
+#gitlab {
+    clear: both;
+}
+.links {
+    text-align: center;
+}
+.links a {
+    text-decoration: none;
+    cursor: pointer;
+}
+#merge-requests ol {
+    list-style: none;
+    margin: 0.5em 0;
+    padding: 0 0 0.5em;
+    overflow: hidden;
+}
+#merge-requests ol li {
+    margin: 0.5em 0.5em 0;
+    padding: 0.5em;
+    border-radius: 6px;
+}
+#merge-requests ol li:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+</style>
+</head>
+<body>
+
+<div id='gitlab'>
+    <div class='links'></div>
+    <div id='message' class='message'></div>
+    <div id='merge-requests'></div>
+</div>
+<script src="./gitlab.js" type='module'></script>
+</body>
+</html>
