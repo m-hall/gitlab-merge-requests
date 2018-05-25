@@ -20,11 +20,11 @@ async function generateMRMarkup(mr, state) {
             <div class='creator'>${mr.author.name}</div>
             <div class='branches'>
                 <div class='from'>
-                    <span class='repo group-unknown repo-${mr.project_id}'>${source.name}</span>
+                    <span class='repo group-${source.namespace.id} repo-${mr.project_id}'>${source.name}</span>
                     <span class='branch'>${mr.source_branch}</span>
                 </div>
                 <div class='to'>
-                    <span class='repo group-unknown repo-${mr.target_project_id} ${mr.target_project_id === mr.project_id ? 'same' : ''}'>${target.name}</span>
+                    <span class='repo group-${target.namespace.id} repo-${mr.target_project_id} ${mr.target_project_id === mr.project_id ? 'same' : ''}'>${target.name}</span>
                     <span class='branch'>${mr.target_branch}</span>
                 </div>
             </div>
