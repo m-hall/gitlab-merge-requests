@@ -6,7 +6,8 @@ const URL_GITLAB = 'https://gitlab.com/api/v4';
 const URL_USER_INFO = `${URL_GITLAB}/user`;
 const URL_ASSIGNED_MERGE_REQUESTS = `${URL_GITLAB}/merge_requests?scope=assigned-to-me&state=opened`;
 const URL_CREATED_MERGE_REQUESTS = `${URL_GITLAB}/merge_requests?scope=created-by-me&state=opened`;
-const URL_LIST_GROUPS = `${URL_GITLAB}/groups`;
+const URL_LIST_GROUPS = `${URL_GITLAB}/groups?membership=true`;
+const URL_GROUP_BY_ID = `${URL_GITLAB}/groups/`;
 const URL_LIST_REPOS = `${URL_GITLAB}/projects?membership=true`;
 const URL_REPO_BY_ID = `${URL_GITLAB}/projects/`;
 
@@ -16,10 +17,11 @@ const DATA_GROUPS = 'gitlab-groups';
 const DATA_REPOS = 'gitlab-repos';
 const DATA_COLOR = 'gitlab-color';
 const DATA_REPO_CACHE = 'gitlab-repo-cache';
+const DATA_GROUP_CACHE = 'gitlab-group-cache';
 
 const CACHE_LIFETIME = 7 * 24 * 60 * 60 * 1000; // 1 week
 
-let groupCache = {};
+let groupCache = null;
 let repoCache = null;
 
 async function _ajax(options) {
@@ -122,6 +124,28 @@ const $GitLab = {
             [DATA_REPO_CACHE]: JSON.stringify(repoCache)
         });
         return repo;
+    },
+    getGroupById: async (id) => {
+        let group;
+        if (!id) {
+            return null;
+        }
+        if (!groupCache) {
+            groupCache = JSON.parse((await $data.get(DATA_GROUP_CACHE)) || '{}');
+        }
+        group = groupCache[id];
+        if (group && group.lastUpdate && (+new Date()) - group.lastUpdate < CACHE_LIFETIME) {
+            return groupCache[id];
+        }
+        group = await _ajax({
+            url: `${URL_GROUP_BY_ID}${id}`
+        });
+        groupCache[id] = group;
+        group.lastUpdate = +new Date();
+        await $data.set({
+            [DATA_GROUP_CACHE]: JSON.stringify(groupCache)
+        });
+        return group;
     },
     getSavedGroups: async () => {
         let groupsString = await $data.get(DATA_GROUPS);

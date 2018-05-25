@@ -9,6 +9,12 @@ const colorError = "#830922";
 let assigned = [];
 let created = [];
 
+async function prefetch(projectId) {
+    let project = await $Gitlab.getRepoById(projectId);
+    if (project.namespace && project.namespace.kind === 'group') {
+        await $Gitlab.getGroupById(project.namespace.id);
+    }
+}
 async function getNumberOfActionsWaiting() {
     if (!await $Gitlab.isLoggedIn()) {
         throw new Error('Not logged in');
@@ -18,13 +24,13 @@ async function getNumberOfActionsWaiting() {
     let number = assigned.length;
     for (let i in assigned) {
         let mr = assigned[i];
-        await $Gitlab.getRepoById(mr.project_id); // just pre-fetching so popup can show up faster
-        await $Gitlab.getRepoById(mr.target_project_id); // just pre-fetching so popup can show up faster
+        await prefetch(mr.project_id);
+        await prefetch(mr.target_project_id);
     }
     for (let i in created) {
         let mr = created[i];
-        await $Gitlab.getRepoById(mr.project_id); // just pre-fetching so popup can show up faster
-        await $Gitlab.getRepoById(mr.target_project_id); // just pre-fetching so popup can show up faster
+        await prefetch(mr.project_id);
+        await prefetch(mr.target_project_id);
         if (mr.state === 'rejected') {
             number++;
         }
