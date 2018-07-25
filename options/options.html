@@ -6,7 +6,7 @@
 .search-list {
     position: relative;
     display: block;
-    margin: 1em;
+    margin: 2em 0.5em;
 }
 .search-list > input,
 .search-list > .autocomplete {
@@ -38,6 +38,9 @@
 .autocomplete li:hover {
     background: #bbb;
 }
+.search-list table {
+    margin: 1em 0;
+}
 </style>
 </head>
 <body>
@@ -54,15 +57,41 @@
         <label for='default-color'>Default color</label>
         <input type='color' id='default-color' value='#6dc34a'/>
     </div>
+    <h3>Groups</h3>
     <div class='search-list'>
-        Groups <input type='text' data-list='groups' />
+        Find by name <input type='text' data-list='groups' />
         <div class='autocomplete'></div>
-        <div class='results' id='groups-list'></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Group Name</th>
+                    <th>Group Nickname</th>
+                    <th>Color</th>
+                    <th>Show MRs</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody class='results' id='groups-list'>
+            </tbody>
+        </table>
     </div>
+    <h3>Repositories</h3>
     <div class='search-list'>
-        Repositories <input type='text' data-list='repos' />
+        Find by name <input type='text' data-list='repos' />
         <div class='autocomplete'></div>
-        <div class='results' id='repos-list'></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Repository Path</th>
+                    <th>Repository Nickname</th>
+                    <th>Color</th>
+                    <th>Show MRs</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody class='results' id='repos-list'>
+            </tbody>
+        </table>
     </div>
 </form>
 <script src="./options.js" type="module"></script>

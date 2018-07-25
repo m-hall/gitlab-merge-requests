@@ -36,9 +36,9 @@ async function selectCompletion(e) {
     let el = e.target;
     e.preventDefault();
     if (el.dataset.repo) {
-        repos[el.dataset.repo] = await addRepo(el.dataset.group, el.dataset.repo, el.dataset.name, '#6dc34a');
+        repos[el.dataset.repo] = await addRepo(el.dataset.group, el.dataset.repo, el.dataset.name, '#6dc34a', false);
     } else {
-        groups[el.dataset.group] = await addGroup(el.dataset.group, el.dataset.name, '#6dc34a');
+        groups[el.dataset.group] = await addGroup(el.dataset.group, el.dataset.name, '#6dc34a', false);
     }
     saveLists();
     return false;
@@ -88,7 +88,7 @@ function search(e) {
     return false;
 }
 function saveName(e) {
-    let el = this.parentNode;
+    let el = this.parentNode.parentNode;
     let id = el.dataset.id;
     let list = el.classList.contains('group') ? groups : repos;
     list[id].name = this.value;
@@ -97,10 +97,19 @@ function saveName(e) {
     return false;
 }
 function saveColor(e) {
-    let el = this.parentNode;
+    let el = this.parentNode.parentNode;
     let id = el.dataset.id;
     let list = el.classList.contains('group') ? groups : repos;
     list[id].color = this.value;
+    saveLists();
+    e.preventDefault();
+    return false;
+}
+function saveShowAll(e) {
+    let el = this.parentNode.parentNode;
+    let id = el.dataset.id;
+    let list = el.classList.contains('group') ? groups : repos;
+    list[id].showAll = this.checked;
     saveLists();
     e.preventDefault();
     return false;
@@ -116,19 +125,21 @@ function removeItem(e) {
     e.preventDefault();
     return false;
 }
-async function addGroup(groupId, name, color) {
+async function addGroup(groupId, name, color, show) {
     let group = await $Gitlab.getGroupById(groupId);
-    let el = $util.html(`
-        <div class='group' data-id='${groupId}'>
-            <button class='remove'>X</button>
-            <span class='id'>${group.name}</span>
-            <input type='text' value='${name}'>
-            <input type='color' value='${color}'>
-        </div>
+    let el = $util.tableRow(`
+        <tr class='group' data-id='${groupId}'>
+            <td class='id'>${group.name}</td>
+            <td><input type='text' value='${name}'></td>
+            <td><input type='color' value='${color}'></td>
+            <td><input type='checkbox' ${show ? 'checked=\'checked\'' : ''}'></td>
+            <td><button class='remove'>X</button></td>
+        </tr>
     `);
     el.querySelector('.remove').addEventListener('click', removeItem);
     el.querySelector('input[type=text]').addEventListener('change', saveName);
     el.querySelector('input[type=color]').addEventListener('change', saveColor);
+    el.querySelector('input[type=checkbox]').addEventListener('change', saveShowAll);
     form.querySelector('#groups-list').appendChild(el);
     return {
         group: groupId,
@@ -136,20 +147,22 @@ async function addGroup(groupId, name, color) {
         color: color
     };
 }
-async function addRepo(groupId, repoId, name, color) {
+async function addRepo(groupId, repoId, name, color, show) {
     let group = await $Gitlab.getGroupById(groupId);
     let repo = await $Gitlab.getRepoById(repoId);
-    let el = $util.html(`
-        <div class='repo' data-id='${repoId}'>
-            <button class='remove'>X</button>
-            <span class='id'>${group.name} > ${repo.name}</span>
-            <input type='text' value='${name}'>
-            <input type='color' value='${color}'>
-        </div>
+    let el = $util.tableRow(`
+        <tr class='repo' data-id='${repoId}'>
+            <td class='id'>${group.name} > ${repo.name}</td>
+            <td><input type='text' value='${name}'></td>
+            <td><input type='color' value='${color}'></td>
+            <td><input type='checkbox' ${show ? 'checked=\'checked\'' : ''}'></td>
+            <td><button class='remove'>X</button></td>
+        </tr>
     `);
     el.querySelector('.remove').addEventListener('click', removeItem);
     el.querySelector('input[type=text]').addEventListener('change', saveName);
     el.querySelector('input[type=color]').addEventListener('change', saveColor);
+    el.querySelector('input[type=checkbox]').addEventListener('change', saveShowAll);
     form.querySelector('#repos-list').appendChild(el);
     return {
         group: groupId,
@@ -162,14 +175,14 @@ async function addRepo(groupId, repoId, name, color) {
 async function loadGroups() {
     groups = await $Gitlab.getSavedGroups();
     for (let i in groups) {
-        await addGroup(groups[i].group, groups[i].name, groups[i].color);
+        await addGroup(groups[i].group, groups[i].name, groups[i].color, groups[i].showAll);
     }
 }
 
 async function loadRepos() {
     repos = await $Gitlab.getSavedRepos();
     for (let i in repos) {
-        await addRepo(repos[i].group, repos[i].repo, repos[i].name, repos[i].color);
+        await addRepo(repos[i].group, repos[i].repo, repos[i].name, repos[i].color, repos[i].showAll);
     }
 }
 
