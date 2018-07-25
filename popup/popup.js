@@ -3,11 +3,14 @@ import $background from '../common/background.js';
 
 const output = document.querySelector('#gitlab');
 let groups, repos;
+
 function getReviewedState(mr) {
-    return mr.state;
+    let approved = mr.approvals.approvals_left === 0;
+    return approved ? 'APPROVED' : mr.state.toUpperCase();
 }
 function getAuthoredReviewState(mr) {
-    return mr.state;
+    let approved = mr.approvals.approvals_left === 0;
+    return approved ? 'APPROVED' : mr.state.toUpperCase();
 }
 async function generateMRMarkup(mr, state) {
     let source = await $Gitlab.getRepoById(mr.project_id);
@@ -73,7 +76,6 @@ function setMessage() {
     }
 }
 
-
 function clickMR(e) {
     let el = e.target;
     do {
@@ -91,7 +93,7 @@ async function getSaved() {
 async function setStyle() {
     let defaultColor = await $Gitlab.getDefaultColor();
     let style = document.createElement('style');
-    let rules = []
+    let rules = [];
     rules.push(`.repo {background-color: ${defaultColor};}`);
     for (let i in groups) {
         let saved = groups[i];

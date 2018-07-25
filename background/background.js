@@ -26,11 +26,13 @@ async function getNumberOfActionsWaiting() {
         let mr = assigned[i];
         await prefetch(mr.project_id);
         await prefetch(mr.target_project_id);
+        mr.approvals = await $Gitlab.getMergeRequestApprovals(mr);
     }
     for (let i in created) {
         let mr = created[i];
         await prefetch(mr.project_id);
         await prefetch(mr.target_project_id);
+        mr.approvals = await $Gitlab.getMergeRequestApprovals(mr);
         if (mr.state === 'rejected') {
             number++;
         }

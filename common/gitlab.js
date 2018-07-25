@@ -10,6 +10,7 @@ const URL_LIST_GROUPS = `${URL_GITLAB}/groups?membership=true`;
 const URL_GROUP_BY_ID = `${URL_GITLAB}/groups/`;
 const URL_LIST_REPOS = `${URL_GITLAB}/projects?membership=true`;
 const URL_REPO_BY_ID = `${URL_GITLAB}/projects/`;
+const URL_MERGE_REQUEST_APPROVALS = `${URL_GITLAB}/projects/:pid/merge_requests/:mriid/approvals`;
 
 const DATA_TOKEN = 'gitlab-token';
 const DATA_USER = 'gitlab-user';
@@ -87,6 +88,11 @@ const $GitLab = {
     getMergeRequestsCreated: async () => {
         return await _ajax({
             url: URL_CREATED_MERGE_REQUESTS
+        });
+    },
+    getMergeRequestApprovals: async (mr) => {
+        return await _ajax({
+            url: URL_MERGE_REQUEST_APPROVALS.replace(':pid', mr.project_id).replace(':mriid', mr.iid)
         });
     },
     searchGroups: async (query) => {
