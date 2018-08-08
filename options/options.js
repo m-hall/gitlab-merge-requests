@@ -1,7 +1,9 @@
 import $Gitlab from '../common/gitlab.js';
 import $util from '../common/util.js';
 
+const THROTTLE_TIME = 500; //500ms
 const form = document.querySelector('form#gitlab');
+let searchTimer = null;
 let searchId = 0;
 let groups = {};
 let repos = {};
@@ -86,6 +88,10 @@ function search(e) {
     });
     e.preventDefault();
     return false;
+}
+function searchThrottle(e) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(search.bind(this, e), THROTTLE_TIME);
 }
 function saveName(e) {
     let el = this.parentNode.parentNode;
@@ -204,7 +210,7 @@ loadCredentials()
     form.querySelector('#forget').addEventListener('click', forget, false);
     form.querySelector('#default-color').addEventListener('change', saveDefaultColor, false);
     for (let searches = form.querySelectorAll('.search-list > input'), i = 0, l = searches.length; i < l; i++) {
-        searches[i].addEventListener('keyup', search, false);
+        searches[i].addEventListener('keyup', searchThrottle, false);
         searches[i].nextElementSibling.addEventListener('click', selectCompletion, false);
     }
 });
