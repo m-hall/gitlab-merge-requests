@@ -121,11 +121,10 @@ function saveShowAll(e) {
     return false;
 }
 function removeItem(e) {
-    let el = this.parentNode;
+    let el = this.parentNode.parentNode;
     let id = el.dataset.id;
     let list = el.classList.contains('group') ? groups : repos;
     delete list[id];
-    console.log(list);
     saveLists();
     el.parentNode.removeChild(el);
     e.preventDefault();
