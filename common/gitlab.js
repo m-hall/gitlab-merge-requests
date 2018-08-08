@@ -96,7 +96,7 @@ const $GitLab = {
         });
     },
     searchGroups: async (query) => {
-        let searchURL = query ? `${URL_LIST_GROUPS}?search=${query}` : URL_LIST_GROUPS;
+        let searchURL = query ? `${URL_LIST_GROUPS}&search=${query}` : URL_LIST_GROUPS;
         let groups = await _ajax({
             url: searchURL
         });
