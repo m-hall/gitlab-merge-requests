@@ -59,6 +59,18 @@ async function fillCreated(mrs) {
         output.querySelector('#merge-requests').appendChild(el);
     }
 }
+async function fillWatched(mrs) {
+    let watched = [];
+    for (let i = 0, l = mrs.length; i < l; i++) {
+        watched.push(await generateMRMarkup(mrs[i], getReviewedState(mrs[i])));
+    }
+    if (watched.length) {
+        let el = document.createElement('ol');
+        el.className = 'watched';
+        el.innerHTML = `<li>${watched.join('</li><li>')}</li>`;
+        output.querySelector('#merge-requests').appendChild(el);
+    }
+}
 function getAssigned() {
     return $background({
         name: 'gitlab-assigned'
@@ -67,6 +79,11 @@ function getAssigned() {
 function getCreated() {
     return $background({
         name: 'gitlab-created'
+    });
+}
+function getWatched() {
+    return $background({
+        name: 'gitlab-watched'
     });
 }
 
@@ -131,6 +148,8 @@ getSaved()
 .then(fillAssigned)
 .then(getCreated)
 .then(fillCreated)
+.then(getWatched)
+.then(fillWatched)
 .then(setMessage, setMessage);
 
 

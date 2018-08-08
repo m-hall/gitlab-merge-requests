@@ -8,6 +8,9 @@ const colorError = "#830922";
 
 let assigned = [];
 let created = [];
+let watched = [];
+let watchedGroups = [];
+let watchedRepos = [];
 
 async function prefetch(projectId) {
     let project = await $Gitlab.getRepoById(projectId);
@@ -15,28 +18,54 @@ async function prefetch(projectId) {
         await $Gitlab.getGroupById(project.namespace.id);
     }
 }
-async function getNumberOfActionsWaiting() {
-    if (!await $Gitlab.isLoggedIn()) {
-        throw new Error('Not logged in');
-    }
+async function fetchAssignedMergeRequests() {
     assigned = (await $Gitlab.getMergeRequestsAssigned()) || [];
-    created = (await $Gitlab.getMergeRequestsCreated()) || [];
-    let number = assigned.length;
     for (let i in assigned) {
         let mr = assigned[i];
         await prefetch(mr.project_id);
         await prefetch(mr.target_project_id);
         mr.approvals = await $Gitlab.getMergeRequestApprovals(mr);
     }
+    return assigned.length;
+}
+async function fetchCreatedMergeRequests() {
+    let numberRelevant = 0;
+    created = (await $Gitlab.getMergeRequestsCreated()) || [];
     for (let i in created) {
         let mr = created[i];
         await prefetch(mr.project_id);
         await prefetch(mr.target_project_id);
         mr.approvals = await $Gitlab.getMergeRequestApprovals(mr);
         if (mr.state === 'rejected') {
-            number++;
+            numberRelevant++;
         }
     }
+    return numberRelevant;
+}
+async function fetchWatchedMergeRequests() {
+    // watchedGroups = await $Gitlab.getSavedGroups();
+    watchedRepos = await $Gitlab.getSavedRepos();
+    for (let i in watchedRepos) {
+        let repo = watchedRepos[i];
+        if (repo.showAll) {
+            watched.push.apply(watched, await $Gitlab.getRepoMergeRequests(await $Gitlab.getRepoById(repo.repo)));
+        }
+    }
+    for (let i in watched) {
+        let mr = watched[i];
+        await prefetch(mr.project_id);
+        await prefetch(mr.target_project_id);
+        mr.approvals = await $Gitlab.getMergeRequestApprovals(mr);
+    }
+    return watched.length;
+}
+async function getNumberOfActionsWaiting() {
+    if (!await $Gitlab.isLoggedIn()) {
+        throw new Error('Not logged in');
+    }
+    let number = await fetchAssignedMergeRequests();
+    number += await fetchCreatedMergeRequests();
+    await fetchWatchedMergeRequests();
     return number;
 }
 
@@ -74,6 +103,9 @@ chrome.extension.onRequest.addListener(
                 return;
             case 'gitlab-created':
                 respond(created);
+                return;
+            case 'gitlab-watched':
+                respond(watched);
                 return;
         }
     }
