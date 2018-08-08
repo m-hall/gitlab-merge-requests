@@ -78,6 +78,10 @@ body {
     margin: 0.5em 0;
     padding: 0 0 0.5em;
     overflow: hidden;
+    border-top: 1px solid #000;
+}
+#merge-requests ol:first-child {
+    border-top: 0;
 }
 #merge-requests ol li {
     margin: 0.5em 0.5em 0;
@@ -87,6 +91,19 @@ body {
 #merge-requests ol li:hover {
     cursor: pointer;
     background-color: rgba(0, 0, 0, 0.1);
+}
+#merge-requests ol::before {
+    font-weight: bold;
+    font-size: 1.4em;
+}
+#merge-requests ol.author::before {
+    content: 'Authored';
+}
+#merge-requests ol.assigned::before {
+    content: 'Assigned';
+}
+#merge-requests ol.watched::before {
+    content: 'Watched';
 }
 </style>
 </head>
