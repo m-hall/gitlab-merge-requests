@@ -43,6 +43,7 @@ async function fetchCreatedMergeRequests() {
     return numberRelevant;
 }
 async function fetchWatchedMergeRequests() {
+    watched = [];
     // watchedGroups = await $Gitlab.getSavedGroups();
     watchedRepos = await $Gitlab.getSavedRepos();
     for (let i in watchedRepos) {
