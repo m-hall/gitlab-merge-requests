@@ -7,6 +7,7 @@ const URL_USER_INFO = `${URL_GITLAB}/user`;
 const URL_ASSIGNED_MERGE_REQUESTS = `${URL_GITLAB}/merge_requests?scope=assigned-to-me&state=opened`;
 const URL_CREATED_MERGE_REQUESTS = `${URL_GITLAB}/merge_requests?scope=created-by-me&state=opened`;
 const URL_REPO_OPEN_MERGE_REQUESTS = `${URL_GITLAB}/projects/:pid/merge_requests?state=opened`;
+const URL_GROUP_OPEN_MERGE_REQUESTS = `${URL_GITLAB}/groups/:gid/merge_requests?state=opened`;
 const URL_LIST_GROUPS = `${URL_GITLAB}/groups?membership=true`;
 const URL_GROUP_BY_ID = `${URL_GITLAB}/groups/`;
 const URL_LIST_REPOS = `${URL_GITLAB}/projects?membership=true`;
@@ -161,6 +162,14 @@ const $GitLab = {
             [DATA_GROUP_CACHE]: JSON.stringify(groupCache)
         });
         return group;
+    },
+    getGroupMergeRequests: async (group) => {
+        if (!group) {
+            return null;
+        }
+        return await _ajax({
+            url: URL_GROUP_OPEN_MERGE_REQUESTS.replace(':gid', group.id)
+        });
     },
     setSavedGroups: async (groups) => {
         let groupsString = JSON.stringify(groups);

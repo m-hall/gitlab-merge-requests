@@ -43,12 +43,20 @@ async function fetchCreatedMergeRequests() {
     return numberRelevant;
 }
 async function fetchWatchedMergeRequests() {
+    let checkedGroups = [];
     watched = [];
-    // watchedGroups = await $Gitlab.getSavedGroups();
+    watchedGroups = await $Gitlab.getSavedGroups();
     watchedRepos = await $Gitlab.getSavedRepos();
+    for (let i in watchedGroups) {
+        let group = watchedGroups[i];
+        if (group.showAll) {
+            checkedGroups.push(group.group);
+            watched.push.apply(watched, await $Gitlab.getGroupMergeRequests(await $Gitlab.getGroupById(group.group)));
+        }
+    }
     for (let i in watchedRepos) {
         let repo = watchedRepos[i];
-        if (repo.showAll) {
+        if (repo.showAll && checkedGroups.indexOf(repo.group) >= 0) {
             watched.push.apply(watched, await $Gitlab.getRepoMergeRequests(await $Gitlab.getRepoById(repo.repo)));
         }
     }
