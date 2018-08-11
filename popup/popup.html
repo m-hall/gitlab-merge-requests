@@ -66,12 +66,13 @@ body {
 #gitlab {
     clear: both;
 }
-.links {
-    text-align: center;
-}
 .links a {
     text-decoration: none;
     cursor: pointer;
+    margin-left: 3px;
+}
+.links::before {
+    content: "See on Gitlab";
 }
 #merge-requests ol {
     list-style: none;
@@ -107,11 +108,19 @@ body {
 #merge-requests ol.watched::before {
     content: 'Watched';
 }
+#options {
+    float: right;
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    color: #555;
+}
 </style>
 </head>
 <body>
 
 <div id='gitlab'>
+    <a href="../options/options.html" id="options" target="_blank">Options</a>
     <div class='links'></div>
     <div id='message' class='message'></div>
     <div id='merge-requests'></div>

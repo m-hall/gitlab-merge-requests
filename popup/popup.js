@@ -126,7 +126,7 @@ async function setStyle() {
 
 async function createLinks() {
     let user = await $Gitlab.getUserInfo();
-    let links = [];
+    let links = [`<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo' target="_blank">All</a>`];
     for (let i in groups) {
         let saved = groups[i];
         let group = await $Gitlab.getGroupById(saved.group);
@@ -137,7 +137,6 @@ async function createLinks() {
         let repo = await $Gitlab.getRepoById(saved.repo);
         links.push(`<a href='https://gitlab.com/${repo.path_with_namespace}/merge_requests' class='repo repo-${saved.repo}' target='_blank'>${saved.name}</a>`);
     }
-    links.push(`<a href='https://gitlab.com/dashboard/merge_requests?assignee_id=${user.id}' class='repo' target="_blank">All</a>`);
     output.querySelector('.links').innerHTML = links.join('');
 }
 
