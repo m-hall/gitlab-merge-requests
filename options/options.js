@@ -2,6 +2,7 @@ import $Gitlab from '../common/gitlab.js';
 import $util from '../common/util.js';
 
 const THROTTLE_TIME = 500; //500ms
+const body = document.body;
 const form = document.querySelector('form#gitlab');
 let searchTimer = null;
 let searchId = 0;
@@ -145,7 +146,7 @@ async function addGroup(groupId, name, color, show) {
     el.querySelector('input[type=text]').addEventListener('change', saveName);
     el.querySelector('input[type=color]').addEventListener('change', saveColor);
     el.querySelector('input[type=checkbox]').addEventListener('change', saveShowAll);
-    form.querySelector('#groups-list').appendChild(el);
+    body.querySelector('#groups-list').appendChild(el);
     return {
         group: groupId,
         name: name,
@@ -168,7 +169,7 @@ async function addRepo(groupId, repoId, name, color, show) {
     el.querySelector('input[type=text]').addEventListener('change', saveName);
     el.querySelector('input[type=color]').addEventListener('change', saveColor);
     el.querySelector('input[type=checkbox]').addEventListener('change', saveShowAll);
-    form.querySelector('#repos-list').appendChild(el);
+    body.querySelector('#repos-list').appendChild(el);
     return {
         group: groupId,
         repo: repoId,
@@ -197,7 +198,7 @@ function saveDefaultColor(e) {
     return false;
 }
 async function loadDefaultColor() {
-    form.querySelector('#default-color').value = await $Gitlab.getDefaultColor();
+    body.querySelector('#default-color').value = await $Gitlab.getDefaultColor();
 }
 
 loadCredentials()
@@ -207,8 +208,8 @@ loadCredentials()
 .then(() => {
     form.addEventListener('submit', login, false);
     form.querySelector('#forget').addEventListener('click', forget, false);
-    form.querySelector('#default-color').addEventListener('change', saveDefaultColor, false);
-    for (let searches = form.querySelectorAll('.search-list > input'), i = 0, l = searches.length; i < l; i++) {
+    body.querySelector('#default-color').addEventListener('change', saveDefaultColor, false);
+    for (let searches = body.querySelectorAll('.search-input > input'), i = 0, l = searches.length; i < l; i++) {
         searches[i].addEventListener('keyup', searchThrottle, false);
         searches[i].nextElementSibling.addEventListener('click', selectCompletion, false);
     }

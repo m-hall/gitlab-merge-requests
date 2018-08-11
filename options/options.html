@@ -8,11 +8,11 @@
     display: block;
     margin: 2em 0.5em;
 }
-.search-list > input,
-.search-list > .autocomplete {
+.search-input > input,
+.search-input > .autocomplete {
     width: 350px;
 }
-.search-list > input {
+.search-input > input {
     z-index: 1;
 }
 .autocomplete {
@@ -25,7 +25,7 @@
     z-index: 2;
     cursor: pointer;
 }
-.search-list > input:focus + .autocomplete,
+.search-input > input:focus + .autocomplete,
 .autocomplete:hover {
     display: block;
 }
@@ -41,59 +41,69 @@
 .search-list table {
     margin: 1em 0;
 }
+.search-input {
+    display:inline-block;
+}
 </style>
 </head>
 <body>
 <form id='gitlab'>
-    <h2>Gitlab</h2>
+    <h2>Gitlab Credentials</h2>
     <div class='token'>
         <label for='token'>Personal Access Token</label>
         <input type='text' name='token' id='token' placeholder="***************"/>
         <span id='username'></span>
     </div>
     <button type='button' id='forget'>Forget</button> <button type='submit' id='login'>Save</button>
-    <h2>Merge Requests</h2>
-    <div>
-        <label for='default-color'>Default color</label>
-        <input type='color' id='default-color' value='#6dc34a'/>
-    </div>
-    <h3>Groups</h3>
-    <div class='search-list'>
-        Find by name <input type='text' data-list='groups' />
-        <div class='autocomplete'></div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Group Name</th>
-                    <th>Group Nickname</th>
-                    <th>Color</th>
-                    <th>Show MRs</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody class='results' id='groups-list'>
-            </tbody>
-        </table>
-    </div>
-    <h3>Repositories</h3>
-    <div class='search-list'>
-        Find by name <input type='text' data-list='repos' />
-        <div class='autocomplete'></div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Repository Path</th>
-                    <th>Repository Nickname</th>
-                    <th>Color</th>
-                    <th>Show MRs</th>
-                    <th>Remove</th>
-                </tr>
-            </thead>
-            <tbody class='results' id='repos-list'>
-            </tbody>
-        </table>
-    </div>
 </form>
+<h2>Merge Requests</h2>
+<div>
+    <label for='default-color'>Default color</label>
+    <input type='color' id='default-color' value='#6dc34a'/>
+</div>
+<h3>Groups</h3>
+<div class='search-list'>
+    Find by name
+    <span class='search-input'>
+        <input type='text' data-list='groups' />
+        <div class='autocomplete'></div>
+    </span>
+    <table>
+        <thead>
+            <tr>
+                <th>Group Name</th>
+                <th>Group Nickname</th>
+                <th>Color</th>
+                <th>Show MRs</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody class='results' id='groups-list'>
+        </tbody>
+    </table>
+</div>
+<h3>Repositories</h3>
+<div class='search-list'>
+    Find by name
+    <span class='search-input'>
+        <input type='text' data-list='repos' />
+        <div class='autocomplete'></div>
+    </span>
+    <div class='autocomplete'></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Repository Path</th>
+                <th>Repository Nickname</th>
+                <th>Color</th>
+                <th>Show MRs</th>
+                <th>Remove</th>
+            </tr>
+        </thead>
+        <tbody class='results' id='repos-list'>
+        </tbody>
+    </table>
+</div>
 <script src="./options.js" type="module"></script>
 </body>
 </html>
