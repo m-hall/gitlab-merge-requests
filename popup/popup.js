@@ -3,6 +3,7 @@ import $background from '../common/background.js';
 
 const output = document.querySelector('#gitlab');
 let groups, repos;
+let mrslist = {};
 
 function getReviewedState(mr) {
     let approved = mr.approvals.approvals_left === 0;
@@ -38,6 +39,10 @@ async function generateMRMarkup(mr, state) {
 async function fillAssigned(mrs) {
     let assigned = [];
     for (let i = 0, l = mrs.length; i < l; i++) {
+        if (mrslist[mrs[i].web_url]) {
+            continue;
+        }
+        mrslist[mrs[i].web_url] = true;
         assigned.push(await generateMRMarkup(mrs[i], getReviewedState(mrs[i])));
     }
     if (assigned.length) {
@@ -50,6 +55,10 @@ async function fillAssigned(mrs) {
 async function fillCreated(mrs) {
     let created = [];
     for (let i = 0, l = mrs.length; i < l; i++) {
+        if (mrslist[mrs[i].web_url]) {
+            continue;
+        }
+        mrslist[mrs[i].web_url] = true;
         created.push(await generateMRMarkup(mrs[i], getAuthoredReviewState(mrs[i])));
     }
     if (created.length) {
@@ -62,6 +71,10 @@ async function fillCreated(mrs) {
 async function fillWatched(mrs) {
     let watched = [];
     for (let i = 0, l = mrs.length; i < l; i++) {
+        if (mrslist[mrs[i].web_url]) {
+            continue;
+        }
+        mrslist[mrs[i].web_url] = true;
         watched.push(await generateMRMarkup(mrs[i], getReviewedState(mrs[i])));
     }
     if (watched.length) {
@@ -143,10 +156,10 @@ async function createLinks() {
 getSaved()
 .then(setStyle)
 .then(createLinks)
-.then(getAssigned)
-.then(fillAssigned)
 .then(getCreated)
 .then(fillCreated)
+.then(getAssigned)
+.then(fillAssigned)
 .then(getWatched)
 .then(fillWatched)
 .then(setMessage, setMessage);
