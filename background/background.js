@@ -1,6 +1,8 @@
 import $Gitlab from '../common/gitlab.js';
 import $badge from '../common/badge.js';
+import $data from '../common/data.js';
 
+const CURRENT_VERSION = '1.0';
 const BADGE_FREQUENCY = 300000;
 const colorSuccess = "#4080d0";
 const colorNeedsWork = "#820dd5";
@@ -93,7 +95,21 @@ async function pollBadge() {
     setTimeout(pollBadge, BADGE_FREQUENCY);
 }
 
+async function install() {
+    let version = await $data.get('version');
+
+    if (!version) {
+        // initial install
+        await $data.set({version: CURRENT_VERSION});
+        chrome.tabs.create({url: '../options/options.html'});
+    } else if (version !== CURRENT_VERSION) {
+        // upgrade
+        await $data.set({version: CURRENT_VERSION});
+    }
+}
+
 async function init() {
+    await install();
     pollBadge();
 }
 
